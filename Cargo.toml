@@ -1,0 +1,10 @@
+[package]
+name = "md-links-rs"
+version = "0.1.0"
+authors = ["Lupo Montero <lupomontero@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+regex = "1"
+rustc-serialize = "0.3.24"
+structopt = "0.2.10"
