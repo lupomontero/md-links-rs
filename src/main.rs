@@ -1,4 +1,3 @@
-
 extern crate rustc_serialize;
 extern crate structopt;
 
@@ -17,7 +16,7 @@ struct Opt {
     /// The path to the file to read
     #[structopt(parse(from_os_str))]
     path: PathBuf,
-    /// Validate links (senf HTTP requests)
+    /// Validate links (send HTTP requests)
     #[structopt(short = "v", long = "validate")]
     validate: bool,
     /// Show stats instead of individual matches
