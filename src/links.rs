@@ -78,3 +78,40 @@ pub fn from(path: &PathBuf) -> Vec<Link> {
 
     links
 }
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    #[should_panic]
+    fn from_should_panic_when_bad_path() {
+        let p = PathBuf::from("__%%__");
+        from(&p);
+    }
+
+    #[test]
+    fn from_should_get_links_from_file() {
+        let p = PathBuf::from("./README.md");
+        let links = from(&p);
+        println!("{:?}", links[0]);
+        assert_eq!(links.len(), 1);
+        assert_eq!(links[0].url, "https://github.com/Laboratoria/curricula-js/tree/master/projects/04-md-links");
+        assert_eq!(links[0].text, "Laboratoria\'s bootcamp project `md-links`");
+        assert_eq!(links[0].file, "./README.md");
+        assert_eq!(links[0].line, 3);
+    }
+
+    #[test]
+    fn from_should_get_links_from_dir() {
+        let p = PathBuf::from("./");
+        let links = from(&p);
+        println!("{:?}", links[0]);
+        assert_eq!(links.len(), 1);
+        assert_eq!(links[0].url, "https://github.com/Laboratoria/curricula-js/tree/master/projects/04-md-links");
+        assert_eq!(links[0].text, "Laboratoria\'s bootcamp project `md-links`");
+        assert_eq!(links[0].file, "./README.md");
+        assert_eq!(links[0].line, 3);
+    }
+}

@@ -17,7 +17,7 @@ struct Opt {
     /// The path to the file to read
     #[structopt(parse(from_os_str))]
     path: PathBuf,
-    /// Validate option
+    /// Validate links (senf HTTP requests)
     #[structopt(short = "v", long = "validate")]
     validate: bool,
     /// Show stats instead of individual matches
