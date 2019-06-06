@@ -38,11 +38,21 @@ ARGS:
 
 ### Rust
 
-```rs
+The Rust library exposes one function:
+
+`md_links::from_path(path: &PathBuf, validate: bool) -> Vec<Link>`
+
+Example:
+
+```rust
 extern crate md_links;
 
 let path = PathBuf::from("./some/dir");
-let links = md_links::from_path(&path);
+let links = md_links::from_path(&path, false);
+
+for link in links {
+  println!("{:?}", link);
+}
 ```
 
 ## Build
