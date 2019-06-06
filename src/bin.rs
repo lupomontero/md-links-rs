@@ -6,6 +6,7 @@ extern crate md_links;
 use std::path::PathBuf;
 use rustc_serialize::json;
 use structopt::StructOpt;
+use md_links::Link;
 
 
 #[derive(Debug, StructOpt)]
@@ -26,23 +27,81 @@ struct Opt {
 }
 
 
-fn main() {
-    let opt = Opt::from_args();
-    let links = md_links::from_path(&opt.path, opt.validate);
+#[derive(Debug, RustcEncodable)]
+struct Stats {
+    total: u32,
+    uniq: u32,
+    broken: Option<u32>,
+}
 
-    if opt.json {
+
+fn print_stats(links: &Vec<Link>, validate: bool, json: bool) {
+    let mut urls = vec![];
+    let mut broken = 0;
+
+    for link in links {
+        urls.push(link.url.to_string());
+        let valid = match link.valid {
+            None => false,
+            Some(x) => x,
+        };
+        if validate && link.target == "absolute" && !valid {
+            broken += 1;
+        }
+    }
+
+    urls.sort_unstable();
+    urls.dedup();
+
+    if json {
+        let stats = Stats {
+            total: links.len() as u32,
+            uniq: urls.len() as u32,
+            broken: if validate { Some(broken) } else { None },
+        };
+        let encoded = json::encode(&stats).unwrap();
+        println!("{}", encoded);
+        return;
+    }
+
+    println!("Total: {:?}", links.len());
+    println!("Uniq: {:?}", urls.len());
+    if validate {
+        println!("Broken: {:?}", broken);
+    }
+}
+
+
+fn print_links(links: &Vec<Link>, validate:bool, json: bool) {
+    if json {
         let encoded = json::encode(&links).unwrap();
         println!("{}", encoded);
         return;
     }
 
     for link in links {
-        println!("{}:{} {} {} {} {}", link.file, link.line, link.url, link.text, match link.valid {
-            None => "",
-            Some(x) => if x { "OK" } else { "INVALID" },
-        }, match link.status {
-            None => 0,
-            Some(x) => x,
-        });
+        if validate {
+            println!("{}:{} {} {} {} {}", link.file, link.line, link.url, link.text, match link.valid {
+                None => "",
+                Some(x) => if x { "OK" } else { "INVALID" },
+            }, match link.status {
+                None => 0,
+                Some(x) => x,
+            });
+        } else {
+            println!("{}:{} {} {}", link.file, link.line, link.url, link.text);
+        }
+    }
+}
+
+
+fn main() {
+    let opt = Opt::from_args();
+    let links = md_links::from_path(&opt.path, opt.validate);
+
+    if opt.stats {
+        print_stats(&links, opt.validate, opt.json);
+    } else {
+        print_links(&links, opt.validate, opt.json);
     }
 }
