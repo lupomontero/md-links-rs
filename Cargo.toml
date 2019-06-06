@@ -6,6 +6,7 @@ edition = "2018"
 
 [dependencies]
 regex = "1"
+reqwest = "0.9.17"
 rustc-serialize = "0.3.24"
 structopt = "0.2.10"
 

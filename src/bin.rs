@@ -28,7 +28,7 @@ struct Opt {
 
 fn main() {
     let opt = Opt::from_args();
-    let links = md_links::from_path(&opt.path);
+    let links = md_links::from_path(&opt.path, opt.validate);
 
     if opt.json {
         let encoded = json::encode(&links).unwrap();
@@ -37,6 +37,12 @@ fn main() {
     }
 
     for link in links {
-        println!("{}:{} {} {}", link.file, link.line, link.url, link.text);
+        println!("{}:{} {} {} {} {}", link.file, link.line, link.url, link.text, match link.valid {
+            None => "",
+            Some(x) => if x { "OK" } else { "INVALID" },
+        }, match link.status {
+            None => 0,
+            Some(x) => x,
+        });
     }
 }
