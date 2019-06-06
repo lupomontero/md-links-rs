@@ -8,3 +8,11 @@ edition = "2018"
 regex = "1"
 rustc-serialize = "0.3.24"
 structopt = "0.2.10"
+
+[lib]
+name = "md_links"
+path = "src/lib.rs"
+
+[[bin]]
+name = "md-links"
+path = "src/bin.rs"

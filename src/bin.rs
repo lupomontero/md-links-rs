@@ -1,8 +1,6 @@
 extern crate rustc_serialize;
 extern crate structopt;
-
-
-mod links;
+extern crate md_links;
 
 
 use std::path::PathBuf;
@@ -30,7 +28,7 @@ struct Opt {
 
 fn main() {
     let opt = Opt::from_args();
-    let links = links::from(&opt.path);
+    let links = md_links::from_path(&opt.path);
 
     if opt.json {
         let encoded = json::encode(&links).unwrap();

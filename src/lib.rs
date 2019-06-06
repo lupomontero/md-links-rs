@@ -61,7 +61,7 @@ fn from_dir(path: &PathBuf) -> Vec<Link> {
 }
 
 
-pub fn from(path: &PathBuf) -> Vec<Link> {
+pub fn from_path(path: &PathBuf) -> Vec<Link> {
     let result = fs::metadata(path);
     let metadata = match result {
         Ok(metadata) => { metadata },

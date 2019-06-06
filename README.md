@@ -14,6 +14,8 @@ cargo install --path .
 
 ## Usage
 
+### CLI
+
 ```sh
 $ md-links-rs --help
 md-links 0.1.0
@@ -32,6 +34,15 @@ FLAGS:
 
 ARGS:
     <path>    The path to the file to read
+```
+
+### Rust
+
+```rs
+extern crate md_links;
+
+let path = PathBuf::from("./some/dir");
+let links = md_links::from_path(&path);
 ```
 
 ## Build
