@@ -4,6 +4,7 @@ extern crate reqwest;
 
 use std::fs;
 use std::path::PathBuf;
+use std::collections::HashMap;
 use regex::Regex;
 
 
@@ -21,13 +22,27 @@ pub struct Link {
 
 fn validate_links(links: &mut Vec<Link>) {
     let client = reqwest::Client::new();
+    let mut cache = HashMap::new();
     for link in links {
-        if link.target == "absolute" {
-            let resp = client.get(&link.url).send().unwrap();
-            let status = resp.status().as_u16();
+        if link.target != "absolute" {
+            continue;
+        }
+
+        let key = link.url.to_string();
+
+        if cache.contains_key(&key) {
+            let status = *cache.get(&key).unwrap();
             link.valid = if status == 200 { Some(true) } else { Some(false) };
             link.status = Some(status);
+            continue;
         }
+
+        // TODO: Handle errors!!!
+        let resp = client.get(&link.url).send().unwrap();
+        let status = resp.status().as_u16();
+        link.valid = if status == 200 { Some(true) } else { Some(false) };
+        link.status = Some(status);
+        cache.insert(key, status);
     }
 }
 
@@ -127,7 +142,6 @@ mod tests {
     fn from_path_should_get_links_from_file() {
         let p = PathBuf::from("./README.md");
         let links = from_path(&p, false);
-        println!("{:?}", links[0]);
         assert_eq!(links.len(), 1);
         assert_eq!(links[0].url, "https://github.com/Laboratoria/curricula-js/tree/master/projects/04-md-links");
         assert_eq!(links[0].text, "Laboratoria\'s bootcamp project `md-links`");
@@ -141,7 +155,6 @@ mod tests {
     fn from_path_should_get_links_from_dir() {
         let p = PathBuf::from("./");
         let links = from_path(&p, false);
-        println!("{:?}", links[0]);
         assert_eq!(links.len(), 1);
         assert_eq!(links[0].url, "https://github.com/Laboratoria/curricula-js/tree/master/projects/04-md-links");
         assert_eq!(links[0].text, "Laboratoria\'s bootcamp project `md-links`");
@@ -155,7 +168,6 @@ mod tests {
     fn from_path_should_get_links_from_dir_and_validate() {
         let p = PathBuf::from("./");
         let links = from_path(&p, true);
-        println!("{:?}", links[0]);
         assert_eq!(links.len(), 1);
         assert_eq!(links[0].url, "https://github.com/Laboratoria/curricula-js/tree/master/projects/04-md-links");
         assert_eq!(links[0].text, "Laboratoria\'s bootcamp project `md-links`");
@@ -163,5 +175,50 @@ mod tests {
         assert_eq!(links[0].line, 3);
         assert_eq!(links[0].valid.unwrap(), true);
         assert_eq!(links[0].status.unwrap(), 200);
+    }
+
+    #[test]
+    fn validate_links_should_handle_http_errors() {
+        let mut links = vec![
+            Link {
+                file: "/README.md".to_string(),
+                line: 1,
+                url: "http://foo.bar".to_string(),
+                text: "Foo".to_string(),
+                target: "absolute".to_string(),
+                valid: None,
+                status: None,
+            },
+        ];
+        validate_links(&mut links);
+        println!("{:?}", links);
+    }
+
+    #[test]
+    fn validate_links_should_use_cache() {
+        let mut links = vec![
+            Link {
+                file: "/README.md".to_string(),
+                line: 1,
+                url: "https://api.github.com".to_string(),
+                text: "Foo".to_string(),
+                target: "absolute".to_string(),
+                valid: None,
+                status: None,
+            },
+            Link {
+                file: "/README.pt-BR.md".to_string(),
+                line: 2,
+                url: "https://api.github.com".to_string(),
+                text: "Foo".to_string(),
+                target: "absolute".to_string(),
+                valid: None,
+                status: None,
+            },
+        ];
+        validate_links(&mut links);
+        assert_eq!(links[0].valid, links[1].valid);
+        assert_eq!(links[0].status, links[1].status);
+        // TODO: Mock HTTP so we can verify only one request was sent???
     }
 }
