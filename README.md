@@ -70,3 +70,22 @@ cargo build --release
 ```sh
 cargo test
 ```
+
+***
+
+## TODO
+
+* Learn Rust 🦀
+* Error handling :see_no_evil:
+* Mock http requests and filesystem in tests?
+* Replace `println!` with a _Writer_ and stream output instead of buffering to a
+  string and printing at the end.
+* [Clippy](https://github.com/rust-lang/rust-clippy)?
+* Code coverage?
+* Add Travis CI build
+* Run requests in multiple threads?
+* Request concurrency and async?
+* Reorganize code in more Rust-like manner
+* Persistent cache (file based)?
+* Progress bar?
+* Validate _relative_ and _fragment_ links?
