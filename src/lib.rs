@@ -20,9 +20,10 @@ pub struct Link {
 
 
 fn validate_links(links: &mut Vec<Link>) {
+    let client = reqwest::Client::new();
     for link in links {
         if link.target == "absolute" {
-            let resp = reqwest::get(&link.url).unwrap();
+            let resp = client.get(&link.url).send().unwrap();
             let status = resp.status().as_u16();
             link.valid = if status == 200 { Some(true) } else { Some(false) };
             link.status = Some(status);
@@ -37,7 +38,7 @@ fn from_file(path: &PathBuf) -> Vec<Link> {
         .expect("could not read file");
 
     let mut line_number: u32 = 1;
-    let re = Regex::new(r"\[(.+)\]\((.+)\)").unwrap();
+    let re = Regex::new(r"\[([^\]]+)\]\(([^\)]+)\)").unwrap();
 
     for line in content.lines() {
         for cap in re.captures_iter(line) {
