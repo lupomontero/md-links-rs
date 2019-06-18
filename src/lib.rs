@@ -37,12 +37,19 @@ fn validate_links(links: &mut Vec<Link>) {
             continue;
         }
 
-        // TODO: Handle errors!!!
-        let resp = client.get(&link.url).send().unwrap();
-        let status = resp.status().as_u16();
-        link.valid = if status == 200 { Some(true) } else { Some(false) };
-        link.status = Some(status);
-        cache.insert(key, status);
+        let response = client.get(&link.url).send();
+        match response {
+          Err(_e) => {
+            link.valid = Some(false);
+          },
+          Ok(_) => {
+            let resp = response.unwrap();
+            let status = resp.status().as_u16();
+            link.valid = if status == 200 { Some(true) } else { Some(false) };
+            link.status = Some(status);
+            cache.insert(key, status);
+          }
+        }
     }
 }
 
@@ -192,6 +199,7 @@ mod tests {
         ];
         validate_links(&mut links);
         println!("{:?}", links);
+        assert_eq!(links[0].valid, Some(false));
     }
 
     #[test]
