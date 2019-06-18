@@ -142,7 +142,7 @@ mod tests {
     fn from_path_should_get_links_from_file() {
         let p = PathBuf::from("./README.md");
         let links = from_path(&p, false);
-        assert_eq!(links.len(), 1);
+        assert_eq!(links.len(), 2);
         assert_eq!(links[0].url, "https://github.com/Laboratoria/curricula-js/tree/master/projects/04-md-links");
         assert_eq!(links[0].text, "Laboratoria\'s bootcamp project `md-links`");
         assert_eq!(links[0].file, "./README.md");
@@ -155,7 +155,7 @@ mod tests {
     fn from_path_should_get_links_from_dir() {
         let p = PathBuf::from("./");
         let links = from_path(&p, false);
-        assert_eq!(links.len(), 1);
+        assert_eq!(links.len(), 2);
         assert_eq!(links[0].url, "https://github.com/Laboratoria/curricula-js/tree/master/projects/04-md-links");
         assert_eq!(links[0].text, "Laboratoria\'s bootcamp project `md-links`");
         assert_eq!(links[0].file, "./README.md");
@@ -168,7 +168,7 @@ mod tests {
     fn from_path_should_get_links_from_dir_and_validate() {
         let p = PathBuf::from("./");
         let links = from_path(&p, true);
-        assert_eq!(links.len(), 1);
+        assert_eq!(links.len(), 2);
         assert_eq!(links[0].url, "https://github.com/Laboratoria/curricula-js/tree/master/projects/04-md-links");
         assert_eq!(links[0].text, "Laboratoria\'s bootcamp project `md-links`");
         assert_eq!(links[0].file, "./README.md");
